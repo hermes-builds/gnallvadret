@@ -1,0 +1,312 @@
+/* Gnällvädret — mobile first. Byggd för 375px, växer uppåt. */
+
+:root {
+  --bg: #171b20;
+  --bg-card: #212730;
+  --bg-card-2: #1b212a;
+  --line: #2e3742;
+  --ink: #e8eaed;
+  --ink-dim: #9aa4b1;
+  --accent: #d8a657;
+  --accent-dim: #8a6d35;
+  --rain: #6fa8c7;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background:
+    radial-gradient(120% 60% at 50% 0%, #232a33 0%, var(--bg) 60%) no-repeat,
+    var(--bg);
+  color: var(--ink);
+  font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-text-size-adjust: 100%;
+  min-height: 100vh;
+}
+
+.wrap {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 18px 16px calc(28px + env(safe-area-inset-bottom));
+}
+
+/* ---------- Rubrik ---------- */
+
+.top { margin: 4px 0 16px; }
+
+h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.tagline {
+  margin: 2px 0 0;
+  color: var(--ink-dim);
+  font-size: 0.875rem;
+}
+
+/* ---------- Platsväljare ---------- */
+
+/* 2x2 på mobil: alla fyra platser syns utan att man behöver scrolla i sidled */
+.places {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.places button {
+  min-height: 44px;              /* tumvänlig träffyta */
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-card-2);
+  color: var(--ink-dim);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, color .15s, border-color .15s;
+}
+
+.places button[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #20242a;
+}
+
+/* ---------- Gubben ---------- */
+
+.gubbe {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: linear-gradient(170deg, #2a3140, #222835);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 15px 16px;
+  margin-bottom: 16px;
+}
+
+.gubbe-face {
+  font-size: 1.9rem;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+.gubbe-quote {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.45;
+  font-style: italic;
+  color: #f2e9d8;
+  text-wrap: pretty;
+}
+
+/* ---------- Just nu ---------- */
+
+.now {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.now-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.now-icon { font-size: 3.4rem; line-height: 1; }
+
+.now-main { min-width: 0; }
+
+.now-temp {
+  margin: 0;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.now-desc {
+  margin: 4px 0 0;
+  color: var(--ink-dim);
+  font-size: 0.9375rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--line);
+}
+
+.stat { min-width: 0; }
+
+.stats dt {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+}
+
+.stats dd {
+  margin: 3px 0 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* ---------- Veckan ---------- */
+
+.week h2 {
+  margin: 0 0 10px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+  font-weight: 700;
+}
+
+.days {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.day {
+  display: grid;
+  /* dag | ikon | nedbörd | temp — håller sig inom 375px */
+  grid-template-columns: 4.6rem 2rem 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 13px;
+  border-top: 1px solid var(--line);
+}
+
+.day:first-child { border-top: 0; }
+.day.is-today { background: #262d38; }
+
+.day-name {
+  font-weight: 650;
+  font-size: 0.875rem;
+}
+
+.day-date {
+  display: block;
+  font-weight: 400;
+  font-size: 0.6875rem;
+  color: var(--ink-dim);
+}
+
+.day-icon {
+  font-size: 1.35rem;
+  text-align: center;
+}
+
+.day-precip {
+  font-size: 0.8125rem;
+  color: var(--rain);
+  font-variant-numeric: tabular-nums;
+}
+
+.day-precip.is-dry { color: #5d6774; }
+
+.day-temp {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9375rem;
+  white-space: nowrap;
+}
+
+.day-max { font-weight: 700; }
+.day-min { color: var(--ink-dim); }
+
+/* ---------- Status ---------- */
+
+.loading {
+  color: var(--ink-dim);
+  font-size: 0.875rem;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.error {
+  background: #32242a;
+  border: 1px solid #5b3a42;
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.error-quote {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-style: italic;
+  color: #f3d9d9;
+}
+
+.error-detail {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  color: #b89a9a;
+  word-break: break-word;
+}
+
+.retry {
+  margin-top: 13px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--accent-dim);
+  background: var(--accent);
+  color: #20242a;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ---------- Fot ---------- */
+
+.foot {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  color: #7c8694;
+  font-size: 0.75rem;
+}
+
+.foot p { margin: 0 0 5px; }
+.foot a { color: var(--ink-dim); }
+
+.updated { font-variant-numeric: tabular-nums; }
+
+/* ---------- Riktigt små skärmar ---------- */
+
+@media (max-width: 340px) {
+  .now-temp { font-size: 2.5rem; }
+  .now-icon { font-size: 2.8rem; }
+  .day { grid-template-columns: 4rem 1.7rem 1fr auto; gap: 6px; }
+  .stats dd { font-size: 0.9375rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}

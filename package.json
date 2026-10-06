@@ -1,0 +1,10 @@
+{
+  "name": "gnallvadret",
+  "version": "1.0.0",
+  "description": "Grumpy Swedish weather app. Static site, no build step. package.json exists only so Node can run the test suite as ES modules.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  }
+}

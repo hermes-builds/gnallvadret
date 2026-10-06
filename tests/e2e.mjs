@@ -170,6 +170,21 @@ check('error state visible when the API fails', errQuote.length > 15, errQuote);
 check('error text is Swedish and grumpy',
   /[åäöÅÄÖ]/.test(errQuote) && !/Failed|Error|undefined/.test(errQuote), errQuote);
 check('persona also comments on the failure', errMainQuote.length > 15, errMainQuote);
+
+/* --- felläget får ALDRIG visa webbläsarens engelska felsträng --- */
+const errDetail = (await page2.locator('#error-detail').textContent()).trim();
+check('error detail line is present and Swedish',
+  errDetail.length > 15 && /[åäöÅÄÖ]/.test(errDetail), errDetail);
+check('error detail line contains no raw Error text',
+  !/Failed to fetch|Tekniskt|NetworkError|Load failed|undefined|TypeError/i.test(errDetail),
+  errDetail);
+
+const errBody = await page2.locator('body').innerText();
+const errEnglish = ['Failed', 'fetch', 'Error', 'Network', 'Loading', 'Retry', 'undefined', 'null',
+  'Today', 'Tomorrow', 'Wind', 'Humidity', 'Forecast']
+  .filter((w) => new RegExp(`\\b${w}\\b`, 'i').test(errBody));
+check('no English anywhere in the rendered error state',
+  errEnglish.length === 0, `${JSON.stringify(errEnglish)} :: ${errBody.replace(/\n/g, ' | ')}`);
 check('error state does not repeat the same line twice',
   errMainQuote !== errQuote, `${errMainQuote} // ${errQuote}`);
 check('retry button is a 44px tap target when visible',

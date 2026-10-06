@@ -10,6 +10,9 @@ import {
   PHRASES,
   IRONIC_JOY,
   ERROR_PHRASES,
+  ERROR_DETAILS,
+  errorKind,
+  errorDetailText,
   IRONIC_CHANCE,
   buildUrl,
   clean,
@@ -385,6 +388,90 @@ test('windLabel is Swedish and scales with speed', () => {
   assert.match(windLabel(1), /lugnt|svag/i);
   assert.match(windLabel(12), /hård|frisk|blåst/i);
   assert.equal(typeof windLabel(null), 'string');
+});
+
+/* ------------------------------------------------------------------ */
+/* Error detail line: Swedish only, never the raw Error string         */
+/* ------------------------------------------------------------------ */
+
+/* Browser error strings that must never reach the DOM. */
+const RAW_BROWSER_ERRORS = [
+  'Failed to fetch',
+  'NetworkError when attempting to fetch resource.',
+  'Load failed',
+  'Unexpected token < in JSON at position 0',
+  'The operation was aborted.',
+  'undefined'
+];
+
+test('every error detail message is Swedish, grumpy and free of English', () => {
+  const values = Object.values(ERROR_DETAILS);
+  assert.ok(values.length >= 3, 'need at least network/http/data variants');
+  for (const msg of values) {
+    assert.equal(typeof msg, 'string');
+    assert.ok(msg.length > 15, `too short: ${msg}`);
+    assert.match(msg, /[åäöÅÄÖ]/, `no Swedish letters: ${msg}`);
+    assert.doesNotMatch(
+      msg,
+      /\b(Failed|Error|Fetch|Network|Unexpected|Load|undefined|null|NaN|TypeError|SyntaxError)\b/i,
+      `English/technical leakage: ${msg}`
+    );
+  }
+  assert.equal(new Set(values).size, values.length, 'detail messages must be distinct');
+});
+
+test('errorKind classifies failures without reading the message text', () => {
+  assert.equal(errorKind(new TypeError('Failed to fetch')), 'network');
+  assert.equal(errorKind(new TypeError('Load failed')), 'network');
+  assert.equal(errorKind(new SyntaxError('Unexpected token <')), 'data');
+  assert.equal(errorKind(Object.assign(new Error('whatever'), { kind: 'http' })), 'http');
+  assert.equal(errorKind(Object.assign(new Error('whatever'), { kind: 'data' })), 'data');
+  assert.equal(errorKind(new Error('something odd')), 'unknown');
+  assert.equal(errorKind(null), 'unknown');
+  assert.equal(errorKind('a bare string'), 'unknown');
+  assert.equal(errorKind(Object.assign(new Error('x'), { kind: 'not-a-kind' })), 'unknown');
+});
+
+test('errorDetailText always returns a known Swedish line, never the raw error', () => {
+  const allowed = new Set(Object.values(ERROR_DETAILS));
+  const cases = [
+    ...RAW_BROWSER_ERRORS.map((m) => new TypeError(m)),
+    ...RAW_BROWSER_ERRORS.map((m) => new SyntaxError(m)),
+    ...RAW_BROWSER_ERRORS.map((m) => new Error(m)),
+    ...RAW_BROWSER_ERRORS,
+    null,
+    undefined,
+    { message: 'Failed to fetch' },
+    Object.assign(new Error('Failed to fetch'), { kind: 'http' })
+  ];
+  for (const err of cases) {
+    const text = errorDetailText(err);
+    assert.ok(allowed.has(text), `off-table text for ${String(err)}: ${text}`);
+    for (const raw of RAW_BROWSER_ERRORS) {
+      assert.ok(!text.includes(raw), `leaked "${raw}" into the UI: ${text}`);
+    }
+  }
+});
+
+test('error detail and error persona phrases never collide', () => {
+  for (const d of Object.values(ERROR_DETAILS)) {
+    assert.ok(!ERROR_PHRASES.includes(d), `detail duplicates a persona phrase: ${d}`);
+  }
+});
+
+/* Static lock: nothing in the DOM glue may push an Error string into the page. */
+test('app.js never writes an error message into the DOM', () => {
+  const src = readFileSync(join(here, '..', 'app.js'), 'utf8');
+  const offenders = src
+    .split('\n')
+    .map((line, i) => ({ line: line.trim(), n: i + 1 }))
+    .filter(({ line }) => /\.(textContent|innerHTML|innerText|title)\s*=/.test(line))
+    .filter(({ line }) => /\.message|\bString\(\s*err|\$\{\s*err\b/.test(line));
+  assert.deepEqual(offenders, [], `raw error text rendered at ${JSON.stringify(offenders)}`);
+  assert.ok(
+    /errorDetailText\s*\(/.test(src),
+    'app.js must map failures through errorDetailText()'
+  );
 });
 
 /* ------------------------------------------------------------------ */

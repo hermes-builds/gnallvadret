@@ -12,6 +12,8 @@ import {
   personaCategory,
   pickPhrase,
   pickErrorPhrase,
+  errorDetailText,
+  failure,
   localDayKey,
   formatDayLabel,
   formatDateShort,
@@ -101,7 +103,10 @@ function showError(err) {
   // En replik, en gång. Gubben ska inte upprepa sig som en trasig grammofon.
   el.quote.textContent = pickErrorPhrase();
   el.errorQuote.textContent = 'Ingen väderdata att gnälla på just nu.';
-  el.errorDetail.textContent = `Tekniskt: ${err && err.message ? err.message : err}`;
+  // Gränssnittet får bara svenska feltexter ur tabellen. Det tekniska — som
+  // webbläsarens engelska "Failed to fetch" — stannar i konsolen.
+  el.errorDetail.textContent = errorDetailText(err);
+  console.error('[gnallvadret] hämtning misslyckades', err);
 }
 
 /* ---------- Rendering ---------- */
@@ -193,16 +198,16 @@ async function load() {
       headers: { Accept: 'application/json' },
       cache: 'no-store'
     });
-    if (!res.ok) throw new Error(`SMHI svarade ${res.status} ${res.statusText}`);
+    if (!res.ok) throw failure('http', `SMHI svarade ${res.status} ${res.statusText}`);
 
     const data = await res.json();
     if (!data || !Array.isArray(data.timeSeries) || data.timeSeries.length === 0) {
-      throw new Error('Prognosen kom tom tillbaka');
+      throw failure('data', 'Prognosen kom tom tillbaka');
     }
 
     const now = new Date();
     const cur = currentFrom(data, now);
-    if (!cur) throw new Error('Hittade ingen prognospunkt för just nu');
+    if (!cur) throw failure('data', 'Hittade ingen prognospunkt för just nu');
 
     renderNow(cur);
     renderWeek(buildDailyForecast(data, now, 7), localDayKey(now));

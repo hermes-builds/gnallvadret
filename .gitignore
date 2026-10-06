@@ -1,0 +1,15 @@
+# Hemligheter får aldrig in i historiken
+.env
+.env.*
+*.pem
+*.key
+secrets.json
+
+# Beroenden och skräp
+node_modules/
+package-lock.json
+.DS_Store
+*.log
+
+# Lokala skärmdumpar från browser-verifieringen
+shot-*.png

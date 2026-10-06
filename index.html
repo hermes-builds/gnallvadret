@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b1f24">
+<meta name="description" content="Gnällvädret — vädret för Mullsjö, Smålandsstenar, Gislaved och Jönköping, kommenterat av en butter gubbe. Data från SMHI.">
+<title>Gnällvädret</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌧️</text></svg>">
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="top">
+    <h1>Gnällvädret</h1>
+    <p class="tagline">Vädret, kommenterat av en butter gubbe</p>
+  </header>
+
+  <nav class="places" id="places" aria-label="Välj plats"></nav>
+
+  <!-- Kärnan i appen: gubbens kommentar -->
+  <section class="gubbe" aria-label="Dagens gnäll">
+    <div class="gubbe-face" aria-hidden="true">🧓</div>
+    <blockquote class="gubbe-quote" id="quote" aria-live="polite">Hämtar eländet…</blockquote>
+  </section>
+
+  <section class="now" id="now" aria-label="Vädret just nu" hidden>
+    <div class="now-head">
+      <span class="now-icon" id="now-icon" aria-hidden="true">·</span>
+      <div class="now-main">
+        <p class="now-temp" id="now-temp">–</p>
+        <p class="now-desc" id="now-desc">–</p>
+      </div>
+    </div>
+    <dl class="stats">
+      <div class="stat">
+        <dt>Vind</dt>
+        <dd id="now-wind">–</dd>
+      </div>
+      <div class="stat">
+        <dt>Nedbörd</dt>
+        <dd id="now-precip">–</dd>
+      </div>
+      <div class="stat">
+        <dt>Luftfuktighet</dt>
+        <dd id="now-humidity">–</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="week" aria-labelledby="week-title" id="week-section" hidden>
+    <h2 id="week-title">Sju dygn framåt</h2>
+    <ol class="days" id="days"></ol>
+  </section>
+
+  <p class="loading" id="loading">Hämtar väderdata från SMHI…</p>
+
+  <section class="error" id="error" role="alert" hidden>
+    <p class="error-quote" id="error-quote"></p>
+    <p class="error-detail" id="error-detail"></p>
+    <button type="button" class="retry" id="retry">Försök igen</button>
+  </section>
+
+  <footer class="foot">
+    <p>Data från <a href="https://opendata.smhi.se/" rel="noopener">SMHI öppna data</a> (prognos-API:et SNOW1gv1). Vädersymboler enligt Wsymb2-skalan.</p>
+    <p id="updated" class="updated"></p>
+  </footer>
+
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

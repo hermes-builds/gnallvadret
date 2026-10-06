@@ -23,7 +23,10 @@ för snart regnar det ändå.
   mening. Blåser det över 10 m/s tar blåsten över som samtalsämne.
   Därtill 4 sura repliker för felläget.
 - **Felläge** på svenska i samma sura tonläge om API-anropet strular, med en
-  "Försök igen"-knapp.
+  "Försök igen"-knapp. Detaljraden hämtas alltid ur tabellen `ERROR_DETAILS`
+  (nät / HTTP / obegriplig data / okänt) — webbläsarens egna engelska
+  felsträngar som "Failed to fetch" renderas aldrig, de går till
+  `console.error`.
 
 Gränssnittet är helt på svenska. Mobile first: byggt och verifierat i 375px
 bredd, med tumvänliga träffytor på minst 44px.

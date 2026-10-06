@@ -134,6 +134,43 @@ export const ERROR_PHRASES = [
   'Nätet strular. Förr ringde man och frågade. Då fick man svar.'
 ];
 
+/*
+ * Feltexterna i gränssnittet kommer ALLTID härifrån — aldrig från err.message.
+ * Webbläsarens egna felsträngar är engelska ("Failed to fetch") och hör inte
+ * hemma framför en svensk gubbe. Det tekniska går till console.error i stället.
+ */
+export const ERROR_DETAILS = Object.freeze({
+  network: 'Nätet svarar inte. Antingen strular uppkopplingen eller så har SMHI gått hem.',
+  http: 'Vädertjänsten svarade med ett gnöl i stället för en prognos. Inte mitt fel, för en gång skull.',
+  data: 'Svaret gick inte att tyda. Bara siffervälling där en prognos borde stått.',
+  unknown: 'Något gick snett på vägen hit. Fråga inte mig vad, jag är bara gammal.'
+});
+
+/*
+ * Klassificerar ett fel UTAN att läsa dess text: egen `kind`-flagga om vi
+ * kastade felet själva, annars felets typ. fetch() kastar TypeError när nätet
+ * dör, res.json() kastar SyntaxError på skräpsvar.
+ */
+export function errorKind(err) {
+  if (err && typeof err === 'object') {
+    if (typeof err.kind === 'string' && Object.hasOwn(ERROR_DETAILS, err.kind)) return err.kind;
+    if (err.name === 'TypeError') return 'network';
+    if (err.name === 'SyntaxError') return 'data';
+  }
+  return 'unknown';
+}
+
+export function errorDetailText(err) {
+  return ERROR_DETAILS[errorKind(err)];
+}
+
+/* Fel vi kastar själva bär en kind-flagga; texten är bara till för console. */
+export function failure(kind, technical) {
+  const err = new Error(technical);
+  err.kind = Object.hasOwn(ERROR_DETAILS, kind) ? kind : 'unknown';
+  return err;
+}
+
 export function personaCategory(symbolCode, windSpeed) {
   const wind = clean(windSpeed);
   if (wind !== null && wind >= WIND_TAKEOVER) return 'wind';
